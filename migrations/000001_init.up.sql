@@ -1,14 +1,12 @@
-create database monitoring;
-
 create table users(
-id serial not null unique,
-name varchar(255) not null,
-username varchar(255) not null unique,
-password_hash varchar(255) not null
+                      id serial not null unique,
+                      name varchar(255) not null,
+                      username varchar(255) not null unique,
+                      password_hash varchar(255) not null
 );
 
 create table agents(
-id serial not null unique,
-name varchar(255) not null,
-description varchar(500)
+                       id serial not null unique,
+                       name varchar(255) not null,
+                       description varchar(500)
 )

@@ -8,6 +8,12 @@ import (
 
 type Settings struct {
 	Port string
+
+	DBHost     string
+	DBPort     string
+	DBUsername string
+	DBName     string
+	DBSSLMode  string
 }
 
 var Config *Settings

@@ -2,7 +2,7 @@
 ### Запуск postgres в docker
 
 ```bash
-./docker run --name=dispatcher-db -e POSTGRES_PASSWORD='123' -p 5436:5432 -d postgres
+./docker run --name=dispatcher-db -e POSTGRES_PASSWORD=123 -p 5436:5432 -d postgres
 ```
 
 ### Создание миграции
@@ -14,11 +14,13 @@
 ### Запуск миграций
 
 ```bash
-./migrate -path ./migrations -database 'postgres://postgres:123@localhost:5436/monitoring?sslmode=disable' up
+./migrate -path ./migrations -database postgres://postgres:123@localhost:5436/postgres?sslmode=disable up
 ```
 
 ### Откат миграций
 
 ```bash
-./migrate -path ./migrations -database 'postgres://postgres:123@localhost:5436/monitoring?sslmode=disable' down
+./migrate -path ./migrations -database postgres://postgres:123@localhost:5436/postgres?sslmode=disable down
 ```
+
+
