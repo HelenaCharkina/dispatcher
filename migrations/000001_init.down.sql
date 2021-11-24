@@ -1,2 +1,1 @@
-drop table users;
-drop table agents;
+drop database if exists monitoring;

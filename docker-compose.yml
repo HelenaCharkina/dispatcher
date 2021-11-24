@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  dispatcher:
+    build: ./
+    command: ./dispatcher
+    ports:
+      - "9001:9001"
+    depends_on:
+      - db
+    environment:
+      - DB_PASSWORD=123
+  db:
+    restart: always
+    image: yandex/clickhouse-server:latest
+    ports:
+      - "9000:9000"
+      - "8123:8123"

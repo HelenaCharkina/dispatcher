@@ -1,9 +1,12 @@
 package repository
 
-import "github.com/jmoiron/sqlx"
+import (
+	"dispatcher/types"
+	"github.com/jmoiron/sqlx"
+)
 
 type Authorization interface {
-
+	GetUser(login, password string) (*types.User, error)
 }
 
 type Agent interface {
@@ -16,5 +19,7 @@ type Repository struct {
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
-	return &Repository{}
+	return &Repository{
+		Authorization: NewAuthClickhouse(db),
+	}
 }

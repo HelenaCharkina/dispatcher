@@ -3,7 +3,7 @@ package service
 import "dispatcher/pkg/repository"
 
 type Authorization interface {
-
+	GenerateToken(login string, password string) (string, error)
 }
 
 type Agent interface {
@@ -16,5 +16,7 @@ type Service struct {
 }
 
 func NewService(repo *repository.Repository) *Service {
-	return &Service{}
+	return &Service{
+		Authorization: NewAuthService(repo.Authorization),
+	}
 }

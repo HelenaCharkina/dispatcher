@@ -1,8 +1,8 @@
 package types
 
 type User struct {
-	Id       int    `json:"-"`
+	Id       string `json:"-" db:"id"`
 	Name     string `json:"name"`
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Login    string `json:"login" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
