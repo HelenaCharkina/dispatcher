@@ -4,6 +4,7 @@ import "dispatcher/pkg/repository"
 
 type Authorization interface {
 	GenerateToken(login string, password string) (string, error)
+	ParseToken (token string) (string, error)
 }
 
 type Agent interface {

@@ -47,8 +47,8 @@ func main() {
 	if err = srv.Shutdown(ctx); err != nil {
 		logrus.Fatalf("Server shutting down error: %s", err)
 	}
-	//if err = client.Disconnect(ctx); err != nil {
-	//	logrus.Fatalf("DB connection close error: %s", err)
-	//}
+	if err = db.Close(); err != nil {
+		logrus.Fatalf("DB connection close error: %s", err)
+	}
 
 }

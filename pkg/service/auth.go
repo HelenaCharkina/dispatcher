@@ -4,6 +4,7 @@ import (
 	"crypto/sha1"
 	"dispatcher/pkg/repository"
 	"dispatcher/types"
+	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"time"
@@ -42,4 +43,23 @@ func (s *AuthService) GenerateToken(login string, password string) (string, erro
 		},
 		UserId: user.Id})
 	return token.SignedString([]byte(signingKey))
+}
+
+func (s *AuthService) ParseToken(accessToken string) (string, error) {
+	token, err := jwt.ParseWithClaims(accessToken, &types.TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("invalid signing method")
+		}
+		return []byte(signingKey), nil
+	})
+	if err != nil {
+		return "", err
+	}
+
+	claims, ok := token.Claims.(*types.TokenClaims)
+	if !ok {
+		return "", errors.New("token claims are not of type *TokenClaims")
+	}
+
+	return claims.UserId, nil
 }
