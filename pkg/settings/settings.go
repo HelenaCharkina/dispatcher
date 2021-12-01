@@ -20,6 +20,9 @@ type Settings struct {
 
 	TokenTTL        time.Duration
 	RefreshTokenTTL time.Duration
+
+	ClientHost string
+	ClientPort string
 }
 
 var Config *Settings

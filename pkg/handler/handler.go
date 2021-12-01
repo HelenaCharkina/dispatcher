@@ -2,6 +2,8 @@ package handler
 
 import (
 	"dispatcher/pkg/service"
+	"dispatcher/pkg/settings"
+	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -41,7 +43,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 func CORSMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://192.168.1.144:9002") // todo вынести
+		c.Writer.Header().Set("Access-Control-Allow-Origin", fmt.Sprintf("http://%s:%s", settings.Config.ClientHost, settings.Config.ClientPort))
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")

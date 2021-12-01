@@ -1,3 +1,24 @@
+## ПОЛНАЯ ИНСТРУКЦИЯ ПО ЗАПУСКУ (для разработчика)
+```bash
+1. Установить утилиту миграций
+go install -tags 'clickhouse' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
+2. Запустить создание контейнера в докере
+docker-compose up --build dispatcher
+
+3. Запустить миграции (удалить комментарий в файле 000001_init.up.sql)
+migrate -database 'clickhouse://localhost:9000?x-multi-statement=true' -path ./migrations up
+
+4. Добавить пользователя в базу вручную
+insert into monitoring.users(id, login, password, name) values (generateUUIDv4(), 'alisa', '67626b6c6d6264666c4a4c4b356b356c34333439664c4b4b6c6c643030343033393238363976626b69646779434740bd001563085fc35165329ea1ff5c5ecbdbbeef', 'Alisa Ganz')
+
+5. Установить настройки в файле conf.ini. Например, адрес клиента.
+
+4. Запустить приложение 
+go run dispatcher
+```
+
+## Памятка команд
 
 ### Запуск postgres в docker
 
@@ -47,3 +68,4 @@ docker-compose up --build dispatcher
 ```bash
 docker-compose up dispatcher
 ```
+
