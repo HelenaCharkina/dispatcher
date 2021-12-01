@@ -4,16 +4,22 @@ import (
 	"github.com/go-ini/ini"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 type Settings struct {
 	Port string
 
-	DBHost     string
-	DBPort     string
-	DBUsername string
-	DBName     string
-	DBSSLMode  string
+	DBHost    string
+	DBPort    string
+	DBName    string
+	DebugMode string
+
+	RedisHost string
+	RedisPort string
+
+	TokenTTL        time.Duration
+	RefreshTokenTTL time.Duration
 }
 
 var Config *Settings

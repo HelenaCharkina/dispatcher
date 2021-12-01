@@ -15,13 +15,13 @@ const (
 func (h *Handler) userIdentity(c *gin.Context) {
 	header := c.GetHeader(authorizationHeader)
 	if header == "" {
-		types.NewErrorResponse(c, http.StatusUnauthorized, "empty auth header")
+		types.NewErrorResponse(c, http.StatusBadRequest, "empty auth header")
 		return
 	}
 
 	headerParts := strings.Split(header, " ")
-	if len(headerParts) != 2 {
-		types.NewErrorResponse(c, http.StatusUnauthorized, "invalid auth header")
+	if len(headerParts) != 2 || headerParts[0] != `Bearer` {
+		types.NewErrorResponse(c, http.StatusBadRequest, "invalid auth header")
 		return
 	}
 

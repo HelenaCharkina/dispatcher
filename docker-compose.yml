@@ -8,6 +8,7 @@ services:
       - "9001:9001"
     depends_on:
       - db
+      - redis
     environment:
       - DB_PASSWORD=123
   db:
@@ -16,3 +17,8 @@ services:
     ports:
       - "9000:9000"
       - "8123:8123"
+  redis:
+    image: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"

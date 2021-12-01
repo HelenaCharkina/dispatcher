@@ -2,7 +2,7 @@ create database if not exists monitoring;
 
 create table if not exists monitoring.users
 (
-    id UUID,
+    id       UUID,
     login    String,
     password String,
     name     String

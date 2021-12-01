@@ -17,7 +17,7 @@ func NewAuthClickhouse(db *sqlx.DB) *AuthClickhouse {
 
 func (r *AuthClickhouse) GetUser(login, password string) (*types.User, error) {
 	var user types.User
-	query := "select id from users where login = ? and password = ?"
+	query := "select id, name from users where login = ? and password = ?"
 	err := r.db.Get(&user, query, login, password)
 
 	return &user, err

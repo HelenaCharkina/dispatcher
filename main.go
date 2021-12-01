@@ -29,7 +29,12 @@ func main() {
 		logrus.Fatalf("DB initialization error: %s", err)
 	}
 
-	repo := repository.NewRepository(db)
+	cache, err := repository.NewRedisCache(ctx)
+	if err != nil {
+		logrus.Fatalf("Cache initialization error: %s", err)
+	}
+
+	repo := repository.NewRepository(db, cache)
 	services := service.NewService(repo)
 	handlers := handler.NewHandler(services)
 
@@ -50,5 +55,7 @@ func main() {
 	if err = db.Close(); err != nil {
 		logrus.Fatalf("DB connection close error: %s", err)
 	}
-
+	if err = cache.Close(); err != nil {
+		logrus.Fatalf("Cache connection close error: %s", err)
+	}
 }
