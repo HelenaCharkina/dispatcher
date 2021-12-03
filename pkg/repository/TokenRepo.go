@@ -8,17 +8,17 @@ import (
 	"time"
 )
 
-type TokenCache struct {
+type TokenRepo struct {
 	client *redis.Client
 }
 
-func NewTokenCache(client *redis.Client) *TokenCache {
-	return &TokenCache{
+func NewTokenRepo(client *redis.Client) *TokenRepo {
+	return &TokenRepo{
 		client: client,
 	}
 }
 
-func (c *TokenCache) GetToken(userId string) (string, error) {
+func (c *TokenRepo) GetToken(userId string) (string, error) {
 	cacheToken, err := c.client.Get(context.TODO(), fmt.Sprintf("token-%s", userId)).Result()
 	if err != nil {
 		return "", err
@@ -26,10 +26,10 @@ func (c *TokenCache) GetToken(userId string) (string, error) {
 	return cacheToken, nil
 }
 
-func (c *TokenCache) SetToken(token string, userId string) error {
+func (c *TokenRepo) SetToken(token string, userId string) error {
 	return c.client.Set(context.TODO(), fmt.Sprintf("token-%s", userId), token, time.Minute*settings.Config.RefreshTokenTTL).Err()
 }
 
-func (c *TokenCache) RemoveToken(userId string) error {
+func (c *TokenRepo) RemoveToken(userId string) error {
 	return c.client.Del(context.TODO(), fmt.Sprintf("token-%s", userId)).Err()
 }

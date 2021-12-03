@@ -18,21 +18,15 @@ const (
 )
 
 type AuthService struct {
-	repo  repository.Authorization
+	repo  repository.User
 	cache repository.Token
 }
 
-func NewAuthService(repo repository.Authorization, cache repository.Token) *AuthService {
+func NewAuthService(repo repository.User, cache repository.Token) *AuthService {
 	return &AuthService{
 		repo:  repo,
 		cache: cache,
 	}
-}
-
-func (s *AuthService) generatePasswordHash(password string) string {
-	hash := sha1.New()
-	hash.Write([]byte(password))
-	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
 }
 
 func (s *AuthService) SignIn(login string, password string) (*types.Response, error) {
@@ -41,43 +35,41 @@ func (s *AuthService) SignIn(login string, password string) (*types.Response, er
 		return nil, err
 	}
 
-	return s.GenerateTokens(user)
-}
-
-func (s *AuthService) GenerateTokens(user *types.User) (*types.Response, error) {
-	accessToken, err := s.GenerateToken(user.Id)
-	if err != nil {
-		return nil, err
-	}
-	refreshToken, err := s.GenerateRefreshToken()
+	response, err := s.generateTokens(user)
 	if err != nil {
 		return nil, err
 	}
 
-	response := types.Response{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
-		User: types.User{
-			Name: user.Name,
-			Id:   user.Id,
-		},
+	err = s.setRefreshToken(response.RefreshToken, response.User.Id)
+	if err != nil {
+		return nil, err
 	}
 
-	return &response, nil
+	return response, nil
 }
 
-func (s *AuthService) GenerateToken(userId string) (string, error) {
+func (s *AuthService) RefreshToken(refreshToken string, userId string) (*types.Response, error) {
+	err := s.checkRefreshToken(refreshToken, userId)
+	if err != nil {
+		return nil, err
+	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &types.TokenClaims{
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(settings.Config.TokenTTL * time.Minute).Unix(),
-			IssuedAt:  time.Now().Unix(),
-		},
-		UserId: userId})
-	return token.SignedString([]byte(signingKey))
+	response, err := s.generateTokens(&types.User{
+		Id: userId,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.setRefreshToken(response.RefreshToken, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
 }
 
-func (s *AuthService) ParseToken(accessToken string) (string, error) {
+func (s *AuthService) CheckToken(accessToken string) (string, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &types.TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid signing method")
@@ -96,7 +88,46 @@ func (s *AuthService) ParseToken(accessToken string) (string, error) {
 	return claims.UserId, nil
 }
 
-func (s *AuthService) GenerateRefreshToken() (string, error) {
+func (s *AuthService) generatePasswordHash(password string) string {
+	hash := sha1.New()
+	hash.Write([]byte(password))
+	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
+}
+
+func (s *AuthService) generateTokens(user *types.User) (*types.Response, error) {
+	accessToken, err := s.generateToken(user.Id)
+	if err != nil {
+		return nil, err
+	}
+	refreshToken, err := s.generateRefreshToken()
+	if err != nil {
+		return nil, err
+	}
+
+	response := types.Response{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+		User: types.User{
+			Name: user.Name,
+			Id:   user.Id,
+		},
+	}
+
+	return &response, nil
+}
+
+func (s *AuthService) generateToken(userId string) (string, error) {
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &types.TokenClaims{
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(settings.Config.TokenTTL * time.Minute).Unix(),
+			IssuedAt:  time.Now().Unix(),
+		},
+		UserId: userId})
+	return token.SignedString([]byte(signingKey))
+}
+
+func (s *AuthService) generateRefreshToken() (string, error) {
 	b := make([]byte, 32)
 	source := rand.NewSource(time.Now().Unix())
 	r := rand.New(source)
@@ -107,11 +138,11 @@ func (s *AuthService) GenerateRefreshToken() (string, error) {
 	return fmt.Sprintf("%x", b), nil
 }
 
-func (s *AuthService) SetRefreshToken(token string, userId string) error {
+func (s *AuthService) setRefreshToken(token string, userId string) error {
 	return s.cache.SetToken(token, userId)
 }
 
-func (s *AuthService) CheckRefreshToken(token string, userId string) error {
+func (s *AuthService) checkRefreshToken(token string, userId string) error {
 	refreshToken, err := s.cache.GetToken(userId)
 	if err != nil {
 		return err

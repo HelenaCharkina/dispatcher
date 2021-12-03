@@ -5,17 +5,17 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type AuthClickhouse struct {
+type UserRepo struct {
 	db *sqlx.DB
 }
 
-func NewAuthClickhouse(db *sqlx.DB) *AuthClickhouse {
-	return &AuthClickhouse{
+func NewUserRepo(db *sqlx.DB) *UserRepo {
+	return &UserRepo{
 		db: db,
 	}
 }
 
-func (r *AuthClickhouse) GetUser(login, password string) (*types.User, error) {
+func (r *UserRepo) GetUser(login, password string) (*types.User, error) {
 	var user types.User
 	query := "select id, name from users where login = ? and password = ?"
 	err := r.db.Get(&user, query, login, password)

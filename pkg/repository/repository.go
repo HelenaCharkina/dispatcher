@@ -6,7 +6,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type Authorization interface {
+type User interface {
 	GetUser(login, password string) (*types.User, error)
 }
 
@@ -19,14 +19,14 @@ type Token interface {
 }
 
 type Repository struct {
-	Authorization
+	User
 	Agent
 	Token
 }
 
 func NewRepository(db *sqlx.DB, cache *redis.Client) *Repository {
 	return &Repository{
-		Authorization: NewAuthClickhouse(db),
-		Token:         NewTokenCache(cache),
+		User:  NewUserRepo(db),
+		Token: NewTokenRepo(cache),
 	}
 }

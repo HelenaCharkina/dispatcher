@@ -19,12 +19,6 @@ func (h Handler) login(c *gin.Context) {
 		return
 	}
 
-	err = h.service.Authorization.SetRefreshToken(response.RefreshToken, response.User.Id)
-	if err != nil {
-		types.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-
 	c.SetCookie("token", response.RefreshToken, 100000, "/auth", "", false, true)
 	c.JSON(http.StatusOK, response)
 }
@@ -45,23 +39,13 @@ func (h Handler) refreshToken(c *gin.Context) {
 		return
 	}
 
-	err = h.service.Authorization.CheckRefreshToken(refreshToken, userId)
+	response, err := h.service.Authorization.RefreshToken(refreshToken, userId)
 	if err != nil {
 		types.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	response, err := h.service.Authorization.GenerateTokens(&types.User{
-		Id: userId,
-	})
-
-	err = h.service.Authorization.SetRefreshToken(response.RefreshToken, userId)
-	if err != nil {
-		types.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	c.SetCookie("token", response.RefreshToken, 10, "/auth", "", false, true)
+	c.SetCookie("token", response.RefreshToken, 100000, "/auth", "", false, true)
 	c.JSON(http.StatusOK, response)
 }
 
