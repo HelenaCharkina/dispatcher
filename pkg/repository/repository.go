@@ -11,11 +11,16 @@ type User interface {
 }
 
 type Agent interface {
+	GetAll() (*[]types.Agent, error)
+	Add(agent *types.Agent) error
+	Update(agent *types.Agent) error
+	Delete(agentId string) error
 }
 
 type Token interface {
 	SetToken(token string, userId string) error
 	GetToken(userId string) (string, error)
+	RemoveToken(userId string) error
 }
 
 type Repository struct {
@@ -28,5 +33,6 @@ func NewRepository(db *sqlx.DB, cache *redis.Client) *Repository {
 	return &Repository{
 		User:  NewUserRepo(db),
 		Token: NewTokenRepo(cache),
+		Agent: NewAgentRepo(db),
 	}
 }

@@ -1,0 +1,1 @@
+alter table monitoring.agents drop column if exists description;

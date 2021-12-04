@@ -35,7 +35,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			agents.GET("/", h.getAllAgents)
 			agents.GET("/:id", h.getAgentById)
 			agents.POST("/", h.addAgent)
-			agents.PUT("/:id", h.updateAgent)
+			agents.PUT("/", h.updateAgent)
+			agents.DELETE("/:id", h.deleteAgent)
 		}
 	}
 	return router

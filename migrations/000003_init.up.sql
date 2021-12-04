@@ -1,0 +1,1 @@
+alter table monitoring.agents add column if not exists description String;

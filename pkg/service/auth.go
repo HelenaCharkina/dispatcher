@@ -69,6 +69,10 @@ func (s *AuthService) RefreshToken(refreshToken string, userId string) (*types.R
 	return response, nil
 }
 
+func (s *AuthService) Logout(userId string) error {
+	return s.cache.RemoveToken(userId)
+}
+
 func (s *AuthService) CheckToken(accessToken string) (string, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &types.TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {

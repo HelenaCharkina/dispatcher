@@ -2,40 +2,44 @@ package handler
 
 import (
 	"dispatcher/types"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 func (h Handler) addAgent(c *gin.Context) {
-	_, ok := c.Get(userCtx)
-	if !ok {
-		types.NewErrorResponse(c, http.StatusUnauthorized, "user not found")
+	var agent types.Agent
+	if err := c.BindJSON(&agent); err != nil {
+		types.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
+
+	err := h.service.Agent.Add(&agent)
+	if err != nil {
+		types.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, nil)
 }
 
 func (h Handler) getAgentById(c *gin.Context) {
-	_, ok := c.Get(userCtx)
-	if !ok {
-		types.NewErrorResponse(c, http.StatusUnauthorized, "user not found")
-		return
-	}
+
 }
 
 func (h Handler) updateAgent(c *gin.Context) {
-	_, ok := c.Get(userCtx)
-	if !ok {
-		types.NewErrorResponse(c, http.StatusUnauthorized, "user not found")
-		return
-	}
+
 }
 
 func (h Handler) getAllAgents(c *gin.Context) {
-	fmt.Println("get all agents!!!")
-	_, ok := c.Get(userCtx)
-	if !ok {
-		types.NewErrorResponse(c, http.StatusUnauthorized, "user not found")
+	agents, err := h.service.Agent.GetAll()
+	if err != nil {
+		types.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
+
+	c.JSON(http.StatusOK, agents)
+}
+
+func (h Handler) deleteAgent(c *gin.Context) {
+
 }

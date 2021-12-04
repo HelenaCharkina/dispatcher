@@ -55,5 +55,10 @@ func (h Handler) logout(c *gin.Context) {
 		types.NewErrorResponse(c, http.StatusInternalServerError, "user not found")
 		return
 	}
-
+	err := h.service.Authorization.Logout(userId)
+	if err != nil {
+		types.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, nil)
 }
