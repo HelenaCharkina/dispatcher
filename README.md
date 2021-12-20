@@ -6,7 +6,7 @@ go install -tags 'clickhouse' github.com/golang-migrate/migrate/v4/cmd/migrate@l
 2. Запустить создание контейнера в докере
 docker-compose up --build dispatcher
 
-3. Запустить миграции (удалить комментарий в файле 000001_init.up.sql)
+3. Запустить миграции (удалить комментарий в файле migrations/000001_init.up.sql)
 migrate -database 'clickhouse://localhost:9000?x-multi-statement=true' -path ./migrations up
 
 4. Добавить пользователя в базу вручную

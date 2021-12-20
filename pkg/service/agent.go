@@ -22,8 +22,12 @@ func (s *AgentService) Add(agent *types.Agent) error {
 	return s.repo.Add(agent)
 }
 func (s *AgentService) Update(agent *types.Agent) error {
-	return nil
+	return s.repo.Update(agent)
 }
 func (s *AgentService) Delete(agentId string) error {
-	return nil
+	return s.repo.Delete(agentId)
+}
+
+func (s *AgentService) SetState(agentId string, state types.State) error {
+	return s.repo.SetState(agentId, state)
 }

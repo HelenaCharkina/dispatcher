@@ -40,18 +40,19 @@ func (r *AgentRepo) GetAll() (*[]types.Agent, error) {
 func (r *AgentRepo) Add(agent *types.Agent) error {
 	var (
 		tx, _   = r.db.Begin()
-		stmt, _ = tx.Prepare("INSERT INTO monitoring.agents (id, ip, port, name, schedule, description, state) VALUES (?, ?, ?, ?, ?, ?, 1)")
+		stmt, _ = tx.Prepare("INSERT INTO monitoring.agents (id, ip, port, name, schedule, description, state) VALUES (?, ?, ?, ?, ?, ?, ?)")
 	)
 	defer stmt.Close()
 
 	id, err := uuid.NewV4()
 	if _, err = stmt.Exec(
-		id,
+		id.String(),
 		agent.Ip,
 		agent.Port,
 		agent.Name,
 		agent.Schedule,
 		agent.Description,
+		1,
 	); err != nil {
 		return err
 	}
@@ -63,8 +64,68 @@ func (r *AgentRepo) Add(agent *types.Agent) error {
 	return nil
 }
 func (r *AgentRepo) Update(agent *types.Agent) error {
+
+	var (
+		tx, _   = r.db.Begin()
+		stmt, _ = tx.Prepare("alter table monitoring.agents update ip=?, port=?, name=?, description=?, schedule=? where id=?")
+	)
+	defer stmt.Close()
+
+	if _, err := stmt.Exec(
+		agent.Ip,
+		agent.Port,
+		agent.Name,
+		agent.Description,
+		agent.Schedule,
+		agent.Id,
+	); err != nil {
+		return err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+
 	return nil
 }
 func (r *AgentRepo) Delete(agentId string) error {
+	var (
+		tx, _   = r.db.Begin()
+		stmt, _ = tx.Prepare("alter table monitoring.agents delete where id=?")
+	)
+	defer stmt.Close()
+
+
+	if _, err := stmt.Exec(
+		agentId,
+	); err != nil {
+		return err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *AgentRepo) SetState(agentId string, state types.State) error  {
+	var (
+		tx, _   = r.db.Begin()
+		stmt, _ = tx.Prepare("alter table monitoring.agents update state=? where id=?")
+	)
+	defer stmt.Close()
+
+	if _, err := stmt.Exec(
+		state,
+		agentId,
+	); err != nil {
+		return err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+
 	return nil
 }

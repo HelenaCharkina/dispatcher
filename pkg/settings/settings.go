@@ -23,6 +23,10 @@ type Settings struct {
 
 	ClientHost string
 	ClientPort string
+
+	RequestTimeout int
+
+	QueueCap int
 }
 
 var Config *Settings

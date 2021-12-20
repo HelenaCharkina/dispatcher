@@ -7,5 +7,13 @@ type Agent struct {
 	Port        string `json:"port" db:"port"`
 	Description string `json:"description" db:"description"`
 	Schedule    string `json:"schedule" db:"schedule"`
-	State       int    `json:"state" db:"state"`
+	State       State  `json:"state" db:"state"`
 }
+
+type State byte
+
+const (
+	STARTED State = 2
+	STOPPED State = 1
+	ERROR   State = 3
+)

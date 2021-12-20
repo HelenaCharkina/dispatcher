@@ -19,5 +19,6 @@ func NewClickhouseDB() (*sqlx.DB, error) {
 		}
 		return nil, fmt.Errorf("Connection ping error: %v ", err)
 	}
+
 	return conn, nil
 }

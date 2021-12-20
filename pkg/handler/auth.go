@@ -2,11 +2,13 @@ package handler
 
 import (
 	"dispatcher/types"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"time"
 )
 
-func (h Handler) login(c *gin.Context) {
+func (h *Handler) login(c *gin.Context) {
 	var user types.User
 	if err := c.BindJSON(&user); err != nil {
 		types.NewErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -23,7 +25,8 @@ func (h Handler) login(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (h Handler) refreshToken(c *gin.Context) {
+func (h *Handler) refreshToken(c *gin.Context) {
+	fmt.Println("refresh " , time.Now())
 	refreshToken, err := c.Cookie("token")
 	if err != nil {
 		if err == http.ErrNoCookie {
@@ -49,7 +52,7 @@ func (h Handler) refreshToken(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (h Handler) logout(c *gin.Context) {
+func (h *Handler) logout(c *gin.Context) {
 	userId := c.Param("user_id")
 	if userId == "" {
 		types.NewErrorResponse(c, http.StatusInternalServerError, "user not found")
